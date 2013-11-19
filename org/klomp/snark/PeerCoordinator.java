@@ -445,6 +445,7 @@ public class PeerCoordinator implements PeerListener
 
         if (completed()) {
             client.interrupt();
+            System.exit(0);
         }
         return true;
     }
