@@ -21,8 +21,10 @@
 package org.klomp.snark;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +35,7 @@ import java.util.logging.Logger;
  */
 class PeerCheckerTask extends TimerTask
 {
-    private static final long KILOPERSECOND = 1024 * (PeerCoordinator.CHECK_PERIOD / 1000);
+    public static final long KILOPERSECOND = 1024 * (PeerCoordinator.CHECK_PERIOD / 1000);
 
     private final PeerCoordinator coordinator;
 
@@ -60,14 +62,16 @@ class PeerCheckerTask extends TimerTask
 
             long uploaded = 0;
             long downloaded = 0;
+            
+            Map<PeerID, Long> uploads = new HashMap<PeerID, Long>();
 
             // Keep track of peers we remove now,
             // we will add them back to the end of the list.
             List<Peer> removed = new ArrayList<Peer>();
 
-            Iterator it = coordinator.peers.iterator();
+            Iterator<Peer> it = coordinator.peers.iterator();
             while (it.hasNext()) {
-                Peer peer = (Peer)it.next();
+                Peer peer = it.next();
 
                 // Remove dying peers
                 if (!peer.isConnected()) {
@@ -103,6 +107,11 @@ class PeerCheckerTask extends TimerTask
                 long download = peer.getDownloaded();
                 downloaded += download;
                 peer.resetCounters();
+                
+                // @eric - Keep track of upload statistics, to calculate throttling
+                // TODO Do we need to restrict this to only people who are actively uploading
+                // to us?  Or will this work for everyone?
+                uploads.put(peer.getPeerID(), upload);
 
                 log.log(Level.FINEST, peer + ":" + " ul: " + upload
                     / KILOPERSECOND + " dl: " + download / KILOPERSECOND
@@ -154,6 +163,26 @@ class PeerCheckerTask extends TimerTask
                         worstDownloader = peer;
                     }
                 }
+            }
+            
+            // Now go through each peer and set a throttle for it
+            it = coordinator.peers.iterator();
+            while (it.hasNext()) {
+            	Peer peer = it.next();
+            	if (uploads.containsKey(peer.getPeerID())) {
+            		long u = uploads.get(peer.getPeerID());
+            		
+            		// Percentage of our download that this peer uploaded
+            		double percentage = (float) u / downloaded;
+            		
+            		long bytesThisPeerGets = Math.round(uploaded * percentage);
+            		
+            		// TODO - again, not entirely sure this will always be an int
+            		int rate = (int) (bytesThisPeerGets / KILOPERSECOND);
+            		
+            		// Adjust the throttling amount for this peer
+            		peer.state.adjustThrottle(rate);
+            	}
             }
 
             // Resync actual uploaders value

@@ -49,6 +49,9 @@ class PeerState
 
     // Package local for use by Peer.
     long downloaded;
+    
+    // @eric - keep track of the rate of data that they sent us last round
+    int rate = Integer.MAX_VALUE;
 
     long uploaded;
 
@@ -474,6 +477,14 @@ class PeerState
             choking = choke;
             out.sendChoke(choke);
         }
+    }
+    
+    /**
+     * Adjust the upload throttle
+     * @param throttle
+     */
+    synchronized void adjustThrottle(int throttle) {
+    	out.adjustThrottle(throttle);
     }
 
     /** The Java logger used to process our log events. */

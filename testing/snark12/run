@@ -1,6 +1,6 @@
 #!/bin/sh
 
 time ./snark http://129.10.116.208:6881/cc683e4eb145acb22a13b7a2fc893da939c844c3.torrent
-echo "Cheating Snark"
+echo "Snark"
 md5 junk.data
 rm junk.data

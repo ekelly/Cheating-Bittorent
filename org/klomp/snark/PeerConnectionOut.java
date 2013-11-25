@@ -20,7 +20,6 @@
 
 package org.klomp.snark;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,7 +31,7 @@ class PeerConnectionOut implements Runnable
 {
     private final Peer peer;
 
-    private final DataOutputStream dout;
+    private final ThrottledDataOutputStream dout;
 
     private Thread thread;
 
@@ -40,7 +39,7 @@ class PeerConnectionOut implements Runnable
 
     private List<Message> sendQueue = new ArrayList<Message>();
 
-    public PeerConnectionOut (Peer peer, DataOutputStream dout)
+    public PeerConnectionOut (Peer peer, ThrottledDataOutputStream dout)
     {
         this.peer = peer;
         this.dout = dout;
@@ -51,8 +50,8 @@ class PeerConnectionOut implements Runnable
     }
 
     /**
-     * Continuesly monitors for more outgoing messages that have to be send.
-     * Stops if quit is true of an IOException occurs.
+     * Continuously monitors for more outgoing messages that have to be send.
+     * Stops if quit is true or an IOException occurs.
      */
     public void run ()
     {
@@ -206,6 +205,14 @@ class PeerConnectionOut implements Runnable
                 addMessage(m);
             }
         }
+    }
+    
+    /**
+     * Throttle the upload connection
+     * @param throttle new throttle in kb/s
+     */
+    void adjustThrottle(int throttle) {
+    	dout.setThrottle(throttle);
     }
 
     void sendInterest (boolean interest)
