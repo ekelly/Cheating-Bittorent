@@ -149,6 +149,7 @@ public class Snark
                 lastException = ioe;
             }
         } else {
+        	/*
             for (port = MIN_PORT; serversocket == null && port <= MAX_PORT; port++) {
                 try {
                     serversocket = new ServerSocket(port);
@@ -156,6 +157,10 @@ public class Snark
                     lastException = ioe;
                 }
             }
+            */
+        	// Ignore min/max port numbers, just take whatever is assigned to us
+        	serversocket = new ServerSocket(0);
+        	port = serversocket.getLocalPort();
         }
         if (serversocket == null) {
             String message = "Cannot accept incoming connections ";
