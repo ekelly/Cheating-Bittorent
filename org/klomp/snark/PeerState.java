@@ -337,9 +337,9 @@ class PeerState
                 lastRequest = null;
             }
 
-            Iterator it = outstandingRequests.iterator();
+            Iterator<Request> it = outstandingRequests.iterator();
             while (it.hasNext()) {
-                Request req = (Request)it.next();
+                Request req = it.next();
                 if (req.piece == piece) {
                     it.remove();
                     // Send cancel even when we are choked to make sure that it
