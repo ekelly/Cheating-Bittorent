@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/bash 
 
 SERVERS=(monkeymolepanic mortalkombat motofrenzy lethalenforcers legionnaire lastresort knuckleheads kingofdragons)
 
