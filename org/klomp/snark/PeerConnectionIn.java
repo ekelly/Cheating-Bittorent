@@ -133,7 +133,7 @@ class PeerConnectionIn implements Runnable
                     break;
                 default:
                     byte[] bs = new byte[i - 1];
-                    din.readFully(bs);
+                    // din.readFully(bs);
                     ps.unknownMessage(b, bs);
                 }
             }
