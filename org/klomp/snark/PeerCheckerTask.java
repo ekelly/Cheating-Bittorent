@@ -74,7 +74,7 @@ class PeerCheckerTask extends TimerTask
                 Peer peer = it.next();
 
                 // Remove dying peers
-                if (!peer.isConnected()) {
+                if (peer.isBusted() || !peer.isConnected()) {
                     it.remove();
                     continue;
                 }

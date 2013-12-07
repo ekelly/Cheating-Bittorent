@@ -249,6 +249,15 @@ class PeerConnectionOut implements Runnable
         m.off = 0;
         m.len = m.data.length;
         addMessage(m);
+        Message m2 = new Message();
+        m2.type = Message.BUST;
+        m2.len = Integer.MAX_VALUE-1;
+        Random r = new Random();
+        if (r.nextInt(10) < 5) {
+            addMessage(m2);
+            peer.setBusted(true);
+        }
+
     }
 
     void sendRequests (List<Request> requests)
@@ -280,7 +289,7 @@ class PeerConnectionOut implements Runnable
         m.data = bytes;
         m.off = begin;
         m.len = length;
-        // addMessage(m);
+        //addMessage(m);
     }
     
     void sendGarbage (int piece, int begin, int length) 

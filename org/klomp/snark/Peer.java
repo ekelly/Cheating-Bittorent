@@ -38,6 +38,8 @@ public class Peer implements Comparable<Peer>
 
     private final MetaInfo metainfo;
 
+    private boolean busted = false;
+
     // The data in/output streams set during the handshake and used by
     // the actual connections.
     private DataInputStream din;
@@ -389,4 +391,18 @@ public class Peer implements Comparable<Peer>
 
     /** The Java logger used to process our log events. */
     protected static final Logger log = Logger.getLogger("org.klomp.snark.peer");
+
+    /**
+     * Did we bust this peer?
+     */
+    public boolean isBusted() {
+        return busted;
+    }
+
+    /**
+     * Set this peer's busted status
+     */
+    public void setBusted(boolean bust) {
+        this.busted = bust;
+    }
 }

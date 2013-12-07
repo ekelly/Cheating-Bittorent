@@ -132,7 +132,10 @@ class PeerConnectionIn implements Runnable
                     ps.cancelMessage(piece, begin, len);
                     break;
                 default:
+                    log.log(Level.INFO, "Allocating array of size " + i);
+                    log.log(Level.INFO, "136: " + Runtime.getRuntime().totalMemory());
                     byte[] bs = new byte[i - 1];
+                    log.log(Level.INFO, "138: " + Runtime.getRuntime().totalMemory());
                     din.readFully(bs);
                     ps.unknownMessage(b, bs);
                 }

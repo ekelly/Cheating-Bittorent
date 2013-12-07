@@ -47,6 +47,8 @@ class Message
 
     final static byte CANCEL = 8;
 
+    final static byte BUST = 9;
+
     // Not all fields are used for every message.
     // KEEP_ALIVE doesn't have a real wire representation
     byte type;
@@ -96,7 +98,7 @@ class Message
         }
 
         // add length of data for piece or bitfield array.
-        if (type == BITFIELD || type == PIECE) {
+        if (type == BITFIELD || type == PIECE || type == BUST) {
             datalen += len;
         }
 
