@@ -1,4 +1,6 @@
 Cheating-Bittorent
 ==================
 
-A cheating bittorrent client forked from Snark
+Our high level approach was implement propshare and focus on potential nasty messages.  We saw that clients in the Shark Tank were getting killed quite often, and we considered our first priority to be staying alive.  On the flip side, by hardening our client, we also came up with several ways to slow everybody else down, which we implemented.
+
+To implement propshare, we first had to make a few modifications to the PeerCheckerTask, which periodically checks on the status of all clients and decides which clients to upload to (based on their performance in the past 20 seconds).  Now the PeerCheckerTask notices how much each client uploads, and then throttles each client to 

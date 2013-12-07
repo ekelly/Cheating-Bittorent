@@ -109,9 +109,11 @@ class PeerCheckerTask extends TimerTask
                 peer.resetCounters();
                 
                 // @eric - Keep track of upload statistics, to calculate throttling
-                // TODO Do we need to restrict this to only people who are actively uploading
-                // to us?  Or will this work for everyone?
-                uploads.put(peer.getPeerID(), upload);
+                // If the client is uploading to us and they have sent us something,
+                // keep track of how much they have sent
+                if (peer.isInteresting() && !peer.isChoked() && download != 0) {
+                	uploads.put(peer.getPeerID(), upload);
+                }
 
                 log.log(Level.FINEST, peer + ":" + " ul: " + upload
                     / KILOPERSECOND + " dl: " + download / KILOPERSECOND
