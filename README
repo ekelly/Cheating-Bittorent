@@ -1,0 +1,10 @@
+Cheating-Bittorent
+==================
+
+Our high level approach was implement propshare and focus on potential nasty messages.  We saw that clients in the Shark Tank were getting killed quite often, and we considered our first priority to be staying alive.  On the flip side, by hardening our client, we also came up with several ways to slow everybody else down, which we implemented.
+
+To implement propshare, we first had to make a few modifications to the PeerCheckerTask, which periodically checks on the status of all clients and decides which clients to upload to (based on their performance in the past 20 seconds).  Now the PeerCheckerTask notices how much each client uploads, and then throttles each client to their share of our upload bandwidth.  The throttling is done by setting a rate on the output stream itself.  When the stream has sent the maximum number of bytes that the rate will allow, it sleeps for 1 second.
+
+To harden our client, we first looked for vulnerabilities.  By far, the most vulnerable place is in PeerConnectionIn, which is where messages from other peers are processed.  There are some gaping vulnerabilities in here, such as automatically allocating however much space is specified that the message contains, even if the message is empty.  There are also possibilities to exploit while loops.  We patched these holes and turned them into our own attacks against other peers.
+
+By far the hardest parts were understanding the bittorrent protocol, and understanding the Snark code.  For instance, trying to figure out whether choking a peer and throttling at the same time wouldn’t cause trouble later on was challenging.  However, identifying possible attack vectors was fairly easy, as there are some gaping security holes in Snark. :-)

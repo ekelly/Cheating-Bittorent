@@ -42,7 +42,7 @@ public class PeerCoordinator implements PeerListener
     // package local for access by CheckDownLoadersTask
     final static long CHECK_PERIOD = 20 * 1000; // 20 seconds
 
-    final static int MAX_CONNECTIONS = 10;
+    final static int MAX_CONNECTIONS = 24;
 
     final static int MAX_UPLOADERS = 4;
 

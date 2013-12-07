@@ -1,0 +1,9 @@
+#!/bin/bash 
+
+SERVERS=(monkeymolepanic mortalkombat motofrenzy lethalenforcers legionnaire lastresort knuckleheads kingofdragons)
+
+for index in ${!SERVERS[*]}; do
+  folder=$(expr $index + 1)
+  ssh ekelly@${SERVERS[$index]}.ccs.neu.edu "cd ~/classes/network/Cheating-Bittorent/testing/snark${folder}/; time ./run" &
+done
+ssh ekelly@hook.ccs.neu.edu "cd ~/classes/network/Cheating-Bittorent/; time ./run" &

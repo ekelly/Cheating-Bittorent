@@ -23,6 +23,7 @@ package org.klomp.snark;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public class Peer implements Comparable<Peer>
     // the actual connections.
     private DataInputStream din;
 
-    private ThrottledDataOutputStream dout;
+    private DataOutputStream dout;
 
     // Keeps state for in/out connections. Non-null when the handshake
     // was successful, the connection setup and runs
@@ -78,7 +79,7 @@ public class Peer implements Comparable<Peer>
         this.my_id = my_id;
         this.metainfo = metainfo;
 
-        byte[] id = handshake(bis, new ThrottledOutputStream(bos));
+        byte[] id = handshake(bis, bos);
         this.peerID = new PeerID(id, sock.getInetAddress(), sock.getPort());
     }
 
@@ -154,8 +155,8 @@ public class Peer implements Comparable<Peer>
                 Socket sock = new Socket(peerID.getAddress(), peerID.getPort());
                 BufferedInputStream bis = new BufferedInputStream(
                     sock.getInputStream());
-                ThrottledOutputStream bos = new ThrottledOutputStream(
-                		new BufferedOutputStream(sock.getOutputStream()));
+                BufferedOutputStream bos = new BufferedOutputStream(
+                    sock.getOutputStream());
                 byte[] id = handshake(bis, bos);
                 byte[] expected_id = peerID.getID();
                 if (!Arrays.equals(expected_id, id)) {
@@ -197,11 +198,11 @@ public class Peer implements Comparable<Peer>
      * Sets DataIn/OutputStreams, does the handshake and returns the id reported
      * by the other side.
      */
-    private byte[] handshake (BufferedInputStream bis, ThrottledOutputStream bos)
+    private byte[] handshake (BufferedInputStream bis, BufferedOutputStream bos)
         throws IOException
     {
         din = new DataInputStream(bis);
-        dout = new ThrottledDataOutputStream(bos);
+        dout = new DataOutputStream(bos);
 
         // Handshake write - header
         dout.write(19);

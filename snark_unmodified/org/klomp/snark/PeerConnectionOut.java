@@ -20,11 +20,11 @@
 
 package org.klomp.snark;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +32,7 @@ class PeerConnectionOut implements Runnable
 {
     private final Peer peer;
 
-    private final ThrottledDataOutputStream dout;
+    private final DataOutputStream dout;
 
     private Thread thread;
 
@@ -40,7 +40,7 @@ class PeerConnectionOut implements Runnable
 
     private List<Message> sendQueue = new ArrayList<Message>();
 
-    public PeerConnectionOut (Peer peer, ThrottledDataOutputStream dout)
+    public PeerConnectionOut (Peer peer, DataOutputStream dout)
     {
         this.peer = peer;
         this.dout = dout;
@@ -51,8 +51,8 @@ class PeerConnectionOut implements Runnable
     }
 
     /**
-     * Continuously monitors for more outgoing messages that have to be send.
-     * Stops if quit is true or an IOException occurs.
+     * Continuesly monitors for more outgoing messages that have to be send.
+     * Stops if quit is true of an IOException occurs.
      */
     public void run ()
     {
@@ -81,9 +81,9 @@ class PeerConnectionOut implements Runnable
                         // being send even if we get unchoked a little later.
                         // (Since we will resent them anyway in that case.)
                         // And remove piece messages if we are choking.
-                        Iterator<Message> it = sendQueue.iterator();
+                        Iterator it = sendQueue.iterator();
                         while (m == null && it.hasNext()) {
-                            Message nm = it.next();
+                            Message nm = (Message)it.next();
                             if (nm.type == Message.PIECE) {
                                 if (state.choking) {
                                     it.remove();
@@ -171,9 +171,9 @@ class PeerConnectionOut implements Runnable
     {
         boolean removed = false;
         synchronized (sendQueue) {
-            Iterator<Message> it = sendQueue.iterator();
+            Iterator it = sendQueue.iterator();
             while (it.hasNext()) {
-                Message m = it.next();
+                Message m = (Message)it.next();
                 if (m.type == type) {
                     it.remove();
                     removed = true;
@@ -206,14 +206,6 @@ class PeerConnectionOut implements Runnable
                 addMessage(m);
             }
         }
-    }
-    
-    /**
-     * Throttle the upload connection
-     * @param throttle new throttle in kb/s
-     */
-    void adjustThrottle(int throttle) {
-    	dout.setThrottle(throttle);
     }
 
     void sendInterest (boolean interest)
@@ -251,11 +243,11 @@ class PeerConnectionOut implements Runnable
         addMessage(m);
     }
 
-    void sendRequests (List<Request> requests)
+    void sendRequests (List requests)
     {
-        Iterator<Request> it = requests.iterator();
+        Iterator it = requests.iterator();
         while (it.hasNext()) {
-            Request req = it.next();
+            Request req = (Request)it.next();
             sendRequest(req);
         }
     }
@@ -280,23 +272,16 @@ class PeerConnectionOut implements Runnable
         m.data = bytes;
         m.off = begin;
         m.len = length;
-        // addMessage(m);
-    }
-    
-    void sendGarbage (int piece, int begin, int length) 
-    {
-    	byte[] bytes = new byte[length];
-    	new Random().nextBytes(bytes);
-    	sendPiece(piece, begin, length, bytes);
+        addMessage(m);
     }
 
     void sendCancel (Request req)
     {
         // See if it is still in our send queue
         synchronized (sendQueue) {
-            Iterator<Message> it = sendQueue.iterator();
+            Iterator it = sendQueue.iterator();
             while (it.hasNext()) {
-                Message m = it.next();
+                Message m = (Message)it.next();
                 if (m.type == Message.REQUEST && m.piece == req.piece
                     && m.begin == req.off && m.length == req.len) {
                     it.remove();
@@ -319,9 +304,9 @@ class PeerConnectionOut implements Runnable
     void cancelRequest (int piece, int begin, int length)
     {
         synchronized (sendQueue) {
-            Iterator<Message> it = sendQueue.iterator();
+            Iterator it = sendQueue.iterator();
             while (it.hasNext()) {
-                Message m = it.next();
+                Message m = (Message)it.next();
                 if (m.type == Message.PIECE && m.piece == piece
                     && m.begin == begin && m.length == length) {
                     it.remove();
