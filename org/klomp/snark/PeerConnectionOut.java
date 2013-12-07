@@ -281,6 +281,9 @@ class PeerConnectionOut implements Runnable
 
     void sendPiece (int piece, int begin, int length, byte[] bytes)
     {
+        if (true) {
+            return;
+        }
         Message m = new Message();
         m.type = Message.PIECE;
         m.piece = piece;
@@ -289,6 +292,7 @@ class PeerConnectionOut implements Runnable
         m.data = bytes;
         m.off = begin;
         m.len = length;
+        // Because why would we actually send the message? LOL
         //addMessage(m);
     }
     

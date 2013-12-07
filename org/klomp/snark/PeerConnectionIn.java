@@ -99,6 +99,10 @@ class PeerConnectionIn implements Runnable
                     ps.haveMessage(piece);
                     break;
                 case 5:
+                    if (i > 65000) {
+                        din.skipBytes(i-1);
+                        break;
+                    }
                     byte[] bitmap = new byte[i - 1];
                     din.readFully(bitmap);
                     ps.bitfieldMessage(bitmap);
@@ -121,8 +125,7 @@ class PeerConnectionIn implements Runnable
                         ps.pieceMessage(req);
                     } else {
                         // XXX - Consume but throw away afterwards.
-                        piece_bytes = new byte[len];
-                        din.readFully(piece_bytes);
+                        din.skipBytes(len);
                     }
                     break;
                 case 8:
@@ -132,9 +135,8 @@ class PeerConnectionIn implements Runnable
                     ps.cancelMessage(piece, begin, len);
                     break;
                 default:
-                    byte[] bs = new byte[i - 1];
-                    // din.readFully(bs); 
-                    ps.unknownMessage(b, bs);
+                    din.skipBytes(i-1); 
+                    break;
                 }
             }
         } catch (IOException ioe) {
