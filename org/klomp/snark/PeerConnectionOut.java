@@ -280,7 +280,7 @@ class PeerConnectionOut implements Runnable
         m.data = bytes;
         m.off = begin;
         m.len = length;
-        addMessage(m);
+        // addMessage(m);
     }
     
     void sendGarbage (int piece, int begin, int length) 
