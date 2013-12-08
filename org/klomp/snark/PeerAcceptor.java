@@ -48,6 +48,16 @@ public class PeerAcceptor
                 coordinator.getMetaInfo());
             coordinator.addPeer(peer);
         } else {
+            final Peer peer = new Peer(socket, bis, bos, coordinator.getID(),
+                coordinator.getMetaInfo());
+            Runnable r = new Runnable() {
+                public void run () {
+                    peer.sendBust();
+                }
+            };
+            String threadName = peer.toString();
+            new Thread(r, threadName).start();
+
             socket.close();
         }
     }
