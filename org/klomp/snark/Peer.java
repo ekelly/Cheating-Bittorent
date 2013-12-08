@@ -135,7 +135,9 @@ public class Peer implements Comparable<Peer>
 
 
     /**
-     * Send a bust to this peer
+     * Send a bust to this peer.  Can be called when setting up a connection
+     * to screw with people, or after a connection already exists to screw
+     * with our peers.
      */
     public void sendBust() {
         try {
