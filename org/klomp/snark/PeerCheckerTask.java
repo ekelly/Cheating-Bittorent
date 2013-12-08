@@ -150,13 +150,14 @@ class PeerCheckerTask extends TimerTask
                     } else if (peer.isInteresting() && !peer.isChoked()
                         && download == 0) {
                         // We are downloading but didn't receive anything...
-                        log.log(Level.FINEST,
-                            "Choke downloader that doesn't deliver:" + peer);
-                        peer.setChoking(true);
-                        uploaders--;
-                        coordinator.uploaders--;
-
-                        // Put it at the back of the list
+                    	// @eric - so screw them
+                    	log.log(Level.FINEST,
+                    			"Maliciously kill peer who is mean to us: " + peer);
+                    	peer.sendBust();
+                    	uploaders--;
+                    	coordinator.uploaders--;
+                    	
+                    	// Put it at the back of the list
                         it.remove();
                         removed.add(peer);
                     } else if (!peer.isChoking() && download < worstdownload) {
@@ -167,7 +168,7 @@ class PeerCheckerTask extends TimerTask
                 }
             }
             
-            // Now go through each peer and set a throttle for it
+            // @eric - Now go through each peer and set a throttle for it
             it = coordinator.peers.iterator();
             while (it.hasNext()) {
             	Peer peer = it.next();
