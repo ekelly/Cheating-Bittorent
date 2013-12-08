@@ -138,31 +138,34 @@ public class Peer implements Comparable<Peer>
      * Send a bust to this peer
      */
     public void sendBust() {
-        if (state != null) {
-            throw new IllegalStateException("Peer already started WHAT WHAT");
-        }
-
         try {
+            PeerConnectionOut out;
 
-            if (din == null) {
-                Socket sock = new Socket(peerID.getAddress(), peerID.getPort());
-                BufferedInputStream bis = new BufferedInputStream(
-                    sock.getInputStream());
-                ThrottledOutputStream bos = new ThrottledOutputStream(
-                		new BufferedOutputStream(sock.getOutputStream()));
-                byte[] id = handshake(bis, bos);
-                byte[] expected_id = peerID.getID();
-                if (!Arrays.equals(expected_id, id)) {
-                    throw new IOException("Unexpected peerID '"
-                        + PeerID.idencode(id) + "' expected '"
-                        + PeerID.idencode(expected_id) + "'");
+            if (state == null) {
+
+                if (din == null) {
+                    Socket sock = new Socket(peerID.getAddress(), peerID.getPort());
+                    BufferedInputStream bis = new BufferedInputStream(
+                            sock.getInputStream());
+                    ThrottledOutputStream bos = new ThrottledOutputStream(
+                            new BufferedOutputStream(sock.getOutputStream()));
+                    byte[] id = handshake(bis, bos);
+                    byte[] expected_id = peerID.getID();
+                    if (!Arrays.equals(expected_id, id)) {
+                        throw new IOException("Unexpected peerID '"
+                                + PeerID.idencode(id) + "' expected '"
+                                + PeerID.idencode(expected_id) + "'");
+                    }
                 }
+
+                PeerConnectionIn in = new PeerConnectionIn(this, din);
+                out = new PeerConnectionOut(this, dout);
+            } else {
+                out = state.out;
             }
 
-            PeerConnectionIn in = new PeerConnectionIn(this, din);
-            PeerConnectionOut out = new PeerConnectionOut(this, dout);
-
             out.sendBust();
+
         } catch (IOException eofe) {
             log.log(Level.FINE, "WHAT WHAT Peer connection to " + peerID.getAddress() + " failed ", eofe);
         } catch (Throwable t) {
