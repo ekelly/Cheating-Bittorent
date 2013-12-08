@@ -160,7 +160,6 @@ public class Peer implements Comparable<Peer>
                     }
                 }
 
-                PeerConnectionIn in = new PeerConnectionIn(this, din);
                 out = new PeerConnectionOut(this, dout);
             } else {
                 out = state.out;
